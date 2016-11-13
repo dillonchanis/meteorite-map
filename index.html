@@ -20,7 +20,7 @@
 			//Create our Projection for the Map
 			var projection = d3.geoEquirectangular()
 				.translate([width/2, height/2])
-				.scale(height * 3 / Math.PI);
+				.scale(height * 1.5 / Math.PI);
 
 			//Give path our projection
 			var path = d3.geoPath().projection(projection);
@@ -32,6 +32,7 @@
 
 			var g = svg.append("g");
 
+			//Giving SVG zoom ability
 			svg.attr("width", width)
 				.attr("height", height)
 				.style("pointer-events", "all")
@@ -52,8 +53,7 @@
 					.enter()
 					.append("path")
 					.attr("d", path)
-					.attr("stroke", "#ccc")
-					.attr("fill", "#e0f2f1");
+					.attr("fill", "#3A3A3A");
 
 				//Get Meteorite Landing from NASA CSV
 				d3.csv("Meteorite_Landings.csv", function(data) {
@@ -68,9 +68,9 @@
 					//Based on Mass of Meteorite, however this varies greatly
 					//Using a scale to limit the size
 					//scale = d3.scale.linear.domain([ inputMin, inputMax ]).range([ outputMin, outputMax ]);
-					var scale = d3.scaleLinear()
-						.domain([domainMin, domainMax])
-						.range([1, 5]);
+					var scale = d3.scalePow().exponent(0.5)
+						.domain([0, 1e6])
+						.range([2, 15]);
 
 					//Paint the Meteorite Landings on our World Map
 					g.selectAll("circle")
@@ -87,9 +87,18 @@
 								return projection([meteors.reclong, meteors.reclat])[1];
 							}
 						})
-						.attr("r", 3)
-						.attr("fill", "#004d40");
+						.attr("transform", function(meteors) {
+							return "translate(" + path.centroid(meteors) + ")";
+						})
+						.attr("r", function(meteors) {
+							return scale(meteors["mass (g)"]);
+						})
+						.append("title")
+							.text(function(meteors) {
+								return meteors.name;
+							})
 
+					//Give all meteorite hits the class 'bubble'
 					g.selectAll("circle").attr("class", "bubble");
 
 				});

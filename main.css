@@ -7,11 +7,19 @@ body {
 }
 
 svg {
-	background-color: #eee;
+	background-color: #181818;
 	width: 90%;
 	height: 90%;
 }
 
+.bubble {
+	fill: #a7ffeb;
+	fill-opacity: 0.5;
+	stroke: #004d40;
+	stroke-width: 0.5px;
+}
+
 .bubble:hover {
-	fill: red;
+	stroke: #000;
+	fill-opacity: 0.75;
 }
