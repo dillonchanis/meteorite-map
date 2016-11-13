@@ -10,22 +10,26 @@
 	
 		<script>
 
+			//SVG Size
 			var width = 960;
 			var height = 600;
 
+			//Create our Projection for the Map
 			var projection = d3.geoEquirectangular()
 				.translate([width/2, height/2])
 				.scale(height / Math.PI);
 
+			//Give path our projection
 			var path = d3.geoPath().projection(projection);
 
+			//Create SVG
 			var svg = d3.select("body").append("svg")
 				.attr("width", width)
 				.attr("height", height);
 
-				var g = svg.append("g");
+			var g = svg.append("g");
 
-
+			//Rectangle 'Overlay' to dish out our zoom behavior
 			svg.append("rect")
 		    .attr("width", width)
 		    .attr("height", height)
@@ -39,8 +43,10 @@
 				g.attr("transform", d3.event.transform);
 			}
 
+			//Get GeoJSON data from our world.json file
 			d3.json("world.json", function(json) {
 
+				//Draw the Map
 				g.selectAll("path")
 					.data(json.features)
 					.enter()
@@ -49,10 +55,13 @@
 					.attr("stroke", "#000")
 					.attr("fill", "#999");
 
+				//Get Meteorite Landing from NASA CSV
 				d3.csv("Meteorite_Landings.csv", function(data) {
 
+					//Get meteors with that have a non-zero lat and long
 					var meteors = filterMeteors(data);
 
+					//Paint the Meteorite Landings on our World Map
 					g.selectAll("circle")
 						.data(data)
 						.enter()
@@ -79,6 +88,7 @@
 			});
 
 			//Returns meteors that have GeoLocation data attached to them
+			//Takes CSV data and returns an array 
 			function filterMeteors(data) {
 				return data.map(function(data) {
 					if(data.reclong !== 0 && data.reclat !== 0) {
