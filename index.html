@@ -3,10 +3,13 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Meteorite Landings</title>
-
+		
+		<link rel="stylesheet" href="main.css" />
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.3.0/d3.min.js"></script>
 	</head>
 	<body>
+
+		<div id="map"></div>
 	
 		<script>
 
@@ -17,24 +20,21 @@
 			//Create our Projection for the Map
 			var projection = d3.geoEquirectangular()
 				.translate([width/2, height/2])
-				.scale(height / Math.PI);
+				.scale(height * 3 / Math.PI);
 
 			//Give path our projection
 			var path = d3.geoPath().projection(projection);
 
 			//Create SVG
-			var svg = d3.select("body").append("svg")
+			var svg = d3.select("#map").append("svg")
 				.attr("width", width)
 				.attr("height", height);
 
 			var g = svg.append("g");
 
-			//Rectangle 'Overlay' to dish out our zoom behavior
-			svg.append("rect")
-		    .attr("width", width)
-		    .attr("height", height)
-		    .style("fill", "none")
-		    .style("pointer-events", "all")
+			svg.attr("width", width)
+				.attr("height", height)
+				.style("pointer-events", "all")
 		    .call(d3.zoom()
 		        .scaleExtent([1, 8])
 		        .on("zoom", zoomed));
@@ -52,14 +52,25 @@
 					.enter()
 					.append("path")
 					.attr("d", path)
-					.attr("stroke", "#000")
-					.attr("fill", "#999");
+					.attr("stroke", "#ccc")
+					.attr("fill", "#e0f2f1");
 
 				//Get Meteorite Landing from NASA CSV
 				d3.csv("Meteorite_Landings.csv", function(data) {
 
 					//Get meteors with that have a non-zero lat and long
 					var meteors = filterMeteors(data);
+
+					var domainMin = d3.min(massArray(meteors));
+					var domainMax = d3.max(massArray(meteors));
+
+					//Setup Radius Scale
+					//Based on Mass of Meteorite, however this varies greatly
+					//Using a scale to limit the size
+					//scale = d3.scale.linear.domain([ inputMin, inputMax ]).range([ outputMin, outputMax ]);
+					var scale = d3.scaleLinear()
+						.domain([domainMin, domainMax])
+						.range([1, 5]);
 
 					//Paint the Meteorite Landings on our World Map
 					g.selectAll("circle")
@@ -76,12 +87,10 @@
 								return projection([meteors.reclong, meteors.reclat])[1];
 							}
 						})
-						.attr("r", function(meteors) {
-							if(meteors["mass (g)"]){
-								return Math.sqrt(parseInt(meteors["mass (g)"]) * 0.00005);
-							}
-						})
-						.attr("fill", "red");
+						.attr("r", 3)
+						.attr("fill", "#004d40");
+
+					g.selectAll("circle").attr("class", "bubble");
 
 				});
 
@@ -95,7 +104,16 @@
 						return data;
 					}
 				});
-			}
+			};
+
+			//Create an array from Meteor CSV data of just Mass
+			function massArray(data) {
+				return data.map(function(data) {
+					if(data["mass (g)"]) {
+						return data["mass (g)"];
+					}
+				});
+			};
 
 		</script>
 	

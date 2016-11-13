@@ -1,0 +1,17 @@
+body {
+	background: #fff;
+}
+
+#map {
+	text-align: center;
+}
+
+svg {
+	background-color: #eee;
+	width: 90%;
+	height: 90%;
+}
+
+.bubble:hover {
+	fill: red;
+}
