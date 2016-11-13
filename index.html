@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Meteorite Landings</title>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.3.0/d3.min.js"></script>
+	</head>
+	<body>
+	
+		<script>
+
+			var width = 900;
+			var height = 600;
+
+			var projection = d3.geoAlbersUsa()
+				.translate([width/2, height/2])
+				.scale([900]);
+
+			var path = d3.geoPath(projection);
+
+			var svg = d3.select("body").append("svg")
+				.attr("width", width)
+				.attr("height", height);
+
+			d3.json("us.geojson", function(json) {
+
+				svg.selectAll("path")
+					.data(json.features)
+					.enter()
+					.append("path")
+					.attr("d", path)
+					.attr("fill", "#999");
+
+			});
+
+/*
+			d3.json("meteorite.json", function(json) {
+
+				svg.selectAll("path")
+					.data(json.features)
+					.enter()
+					.append("path")
+					.attr("d", path)
+					.attr("fill", "#666");
+
+			}); */
+
+		</script>
+	
+	</body>
+</html>
